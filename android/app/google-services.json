@@ -1,0 +1,48 @@
+{
+  "project_info": {
+    "project_number": "883888865686",
+    "project_id": "propertykar-6fa26",
+    "storage_bucket": "propertykar-6fa26.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:883888865686:android:d37b221a9a894ad4239db7",
+        "android_client_info": {
+          "package_name": "com.ebroker.wrteam"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyA-XS0q8SjJ2b6mC8BE4tawlfrdBYyBj8Q"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:883888865686:android:0a76b1196dba242e239db7",
+        "android_client_info": {
+          "package_name": "com.example.real_estate_app"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyA-XS0q8SjJ2b6mC8BE4tawlfrdBYyBj8Q"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
