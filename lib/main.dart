@@ -1,8 +1,3 @@
-// import 'package:amplify_api/amplify_api.dart';
-// import 'package:amplify_auth_cognito/amplify_auth_cognito.dart';
-// import 'package:amplify_flutter/amplify_flutter.dart';
-// import 'package:amplify_storage_s3/amplify_storage_s3.dart';
-// import 'package:revaugment/utils/constants/hive.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/gestures.dart';
@@ -74,8 +69,8 @@ class MyApp extends StatelessWidget {
         },
       ),
       debugShowCheckedModeBanner: false,
-      // initialRoute: AppRoutes.SPLASH,
-      // onGenerateRoute: (settings) => generateRoute(settings),
+      initialRoute: AppRoutes.SPLASH,
+      onGenerateRoute: (settings) => generateRoute(settings),
       // routes: getApplicationRoutes(),
     );
   }
