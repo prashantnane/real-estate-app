@@ -42,6 +42,16 @@ dependencies:
 #  url_launcher: ^6.2.6
   firebase_storage: ^11.7.4
   connectivity_plus: ^6.0.3
+  flutter_bloc: ^8.1.1
+  flutter_sim_country_code: ^0.1.2
+  sms_autofill: ^2.2.0
+  country_code_picker: ^2.0.2
+  country_picker: ^2.0.19
+  mime_type: ^1.0.0
+  lottie: ^2.1.0
+  cached_network_image: ^3.2.3
+  intl: ^0.17.0
+  flutter_svg: 1.1.6
 
 dev_dependencies:
   flutter_test:
