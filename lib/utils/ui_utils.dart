@@ -9,10 +9,10 @@ import 'package:intl/intl.dart';
 import 'package:lottie/lottie.dart';
 import 'package:mime_type/mime_type.dart';
 
-import '../Ui/screens/widgets/AnimatedRoutes/blur_page_route.dart';
-import '../Ui/screens/widgets/blurred_dialoge_box.dart';
-import '../Ui/screens/widgets/full_screen_image_view.dart';
-import '../Ui/screens/widgets/gallery_view.dart';
+import '../Ui/widgets/blur_page_route.dart';
+import '../Ui/widgets/blurred_dialoge_box.dart';
+import '../Ui/widgets/full_screen_image_view.dart';
+import '../Ui/widgets/gallery_view.dart';
 import '../app/app_localization.dart';
 import '../app/app_theme.dart';
 import '../data/cubits/system/app_theme_cubit.dart';
@@ -431,27 +431,27 @@ class UiUtils {
     });
   }
 
-  static Future showBlurredDialoge(BuildContext context,
-      {required BlurDialoge dialoge, double? sigmaX, double? sigmaY}) async {
-    return await Navigator.push(
-      context,
-      BlurredRouter(
-          barrierDismiss: true,
-          builder: (context) {
-            if (dialoge is BlurredDialogBox) {
-              return dialoge;
-            } else if (dialoge is BlurredDialogBuilderBox) {
-              return dialoge;
-            } else if (dialoge is EmptyDialogBox) {
-              return dialoge;
-            }
-
-            return Container();
-          },
-          sigmaX: sigmaX,
-          sigmaY: sigmaY),
-    );
-  }
+  // static Future showBlurredDialoge(BuildContext context,
+  //     {required BlurDialoge dialoge, double? sigmaX, double? sigmaY}) async {
+  //   return await Navigator.push(
+  //     context,
+  //     BlurredRouter(
+  //         barrierDismiss: true,
+  //         builder: (context) {
+  //           if (dialoge is BlurredDialogBox) {
+  //             return dialoge;
+  //           } else if (dialoge is BlurredDialogBuilderBox) {
+  //             return dialoge;
+  //           } else if (dialoge is EmptyDialogBox) {
+  //             return dialoge;
+  //           }
+  //
+  //           return Container();
+  //         },
+  //         sigmaX: sigmaX,
+  //         sigmaY: sigmaY),
+  //   );
+  // }
 
 //AAA is color theory's point it means if color is AAA then it will be perfect for your app
   static bool isColorMatchAAA(Color textColor, Color background) {

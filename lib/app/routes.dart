@@ -10,9 +10,11 @@ import 'dart:developer';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
-import '../pages/login_screen.dart';
-import '../pages/splash_screen.dart';
-import '../pages/widgets/blur_page_route.dart';
+import '../Ui/login_screen.dart';
+import '../Ui/splash_screen.dart';
+import '../Ui/widgets/blur_page_route.dart';
+
+import '../utils/ui_utils.dart';
 
 // import '../Ui/screens/Advertisement/create_advertisement_screen.dart';
 // import '../Ui/screens/Advertisement/my_advertisment_screen.dart';
@@ -119,7 +121,7 @@ class Routes {
       // case main:
       //   return MainActivity.route(routeSettings);
       case login:
-        return LoginScreen.route(routeSettings);
+        // return LoginScreen.route(routeSettings);
     //   case completeProfile:
     //     return UserProfileScreen.route(routeSettings);
     // // case addProperty:

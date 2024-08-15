@@ -5,19 +5,21 @@ import 'dart:math';
 
 import 'package:connectivity_plus/connectivity_plus.dart';
 //import 'package:flutter_image_compress/flutter_image_compress.dart';
-import 'package:ebroker/utils/Extensions/extensions.dart';
-import 'package:ebroker/utils/api.dart';
-import 'package:ebroker/utils/hive_utils.dart';
+// import 'package:ebroker/utils/Extensions/extensions.dart';
+// import 'package:ebroker/utils/api.dart';
+// import 'package:ebroker/utils/hive_utils.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter_native_image/flutter_native_image.dart';
+// import 'package:flutter_native_image/flutter_native_image.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:http/http.dart';
-import 'package:share_plus/share_plus.dart';
+import 'package:real_estate_app/utils/Extensions/extensions.dart';
+// import 'package:share_plus/share_plus.dart';
 
-import '../data/helper/custom_exception.dart';
+// import '../data/helper/custom_exception.dart';
 import 'constant.dart';
-import 'deeplinkManager.dart';
+// import 'deeplinkManager.dart';
+import 'hive_utils.dart';
 
 enum MessageType {
   success(successMessageColor),
@@ -79,44 +81,44 @@ class HelperUtils {
     return int.parse(plain);
   }
 
-  static void share(BuildContext context, int propertyId) {
-    showModalBottomSheet(
-      context: context,
-      backgroundColor: context.color.backgroundColor,
-      builder: (context) {
-        return Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            ListTile(
-              leading: const Icon(Icons.copy),
-              title: Text("copylink".translate(context)),
-              onTap: () async {
-                String shortLink =
-                    await DeepLinkManager.buildDynamicLink(propertyId);
-                await Clipboard.setData(ClipboardData(text: shortLink));
-
-                Future.delayed(Duration.zero, () {
-                  Navigator.pop(context);
-                  HelperUtils.showSnackBarMessage(
-                      context, "copied".translate(context));
-                });
-              },
-            ),
-            ListTile(
-              leading: const Icon(Icons.share),
-              title: Text("share".translate(context)),
-              onTap: () async {
-                String shortLink =
-                    await DeepLinkManager.buildDynamicLink(propertyId);
-
-                await Share.share(shortLink);
-              },
-            ),
-          ],
-        );
-      },
-    );
-  }
+  // static void share(BuildContext context, int propertyId) {
+  //   showModalBottomSheet(
+  //     context: context,
+  //     backgroundColor: context.color.backgroundColor,
+  //     builder: (context) {
+  //       return Column(
+  //         mainAxisSize: MainAxisSize.min,
+  //         children: [
+  //           ListTile(
+  //             leading: const Icon(Icons.copy),
+  //             title: Text("copylink".translate(context)),
+  //             onTap: () async {
+  //               String shortLink =
+  //                   await DeepLinkManager.buildDynamicLink(propertyId);
+  //               await Clipboard.setData(ClipboardData(text: shortLink));
+  //
+  //               Future.delayed(Duration.zero, () {
+  //                 Navigator.pop(context);
+  //                 HelperUtils.showSnackBarMessage(
+  //                     context, "copied".translate(context));
+  //               });
+  //             },
+  //           ),
+  //           ListTile(
+  //             leading: const Icon(Icons.share),
+  //             title: Text("share".translate(context)),
+  //             onTap: () async {
+  //               String shortLink =
+  //                   await DeepLinkManager.buildDynamicLink(propertyId);
+  //
+  //               await Share.share(shortLink);
+  //             },
+  //           ),
+  //         ],
+  //       );
+  //     },
+  //   );
+  // }
 
   static void unfocus() {
     FocusManager.instance.primaryFocus?.unfocus();
@@ -161,104 +163,104 @@ class HelperUtils {
     }
   }
 
-  static Future sendApiRequest(
-    String url,
-    Map<String, dynamic> body,
-    bool ispost,
-    BuildContext context, {
-    bool passUserid = true,
-  }) async {
-    Map<String, String> headersdata = {
-      "accept": "application/json",
-    };
+  // static Future sendApiRequest(
+  //   String url,
+  //   Map<String, dynamic> body,
+  //   bool ispost,
+  //   BuildContext context, {
+  //   bool passUserid = true,
+  // }) async {
+  //   Map<String, String> headersdata = {
+  //     "accept": "application/json",
+  //   };
+  //
+  //   String token = HiveUtils.getJWT().toString();
+  //   if (token.trim().isNotEmpty) {
+  //     headersdata["Authorization"] = "Bearer $token";
+  //   }
+  //   if (passUserid && HiveUtils.isUserAuthenticated()) {
+  //     body[Api.userid] = HiveUtils.getUserId().toString();
+  //   }
+  //   Response response;
+  //   try {
+  //     if (ispost) {
+  //       response = await post(
+  //         Uri.parse(Constant.baseUrl + url),
+  //         body: body.isNotEmpty ? body : null,
+  //         headers: headersdata,
+  //       );
+  //     } else {
+  //       response = await get(
+  //         Uri.parse(
+  //           Constant.baseUrl + url,
+  //         ),
+  //         headers: headersdata,
+  //       );
+  //     }
+  //     await Future.delayed(
+  //       Duration.zero,
+  //       () {
+  //         return getJsonResponse(context,
+  //             isfromfile: false, response: response);
+  //       },
+  //     );
+  //   } on SocketException {
+  //     throw FetchDataException("noInternetErrorMsg".translate(context));
+  //   } on TimeoutException {
+  //     throw FetchDataException("nodatafound".translate(context));
+  //   } on Exception catch (e) {
+  //     throw Exception(e.toString());
+  //   }
+  // }
 
-    String token = HiveUtils.getJWT().toString();
-    if (token.trim().isNotEmpty) {
-      headersdata["Authorization"] = "Bearer $token";
-    }
-    if (passUserid && HiveUtils.isUserAuthenticated()) {
-      body[Api.userid] = HiveUtils.getUserId().toString();
-    }
-    Response response;
-    try {
-      if (ispost) {
-        response = await post(
-          Uri.parse(Constant.baseUrl + url),
-          body: body.isNotEmpty ? body : null,
-          headers: headersdata,
-        );
-      } else {
-        response = await get(
-          Uri.parse(
-            Constant.baseUrl + url,
-          ),
-          headers: headersdata,
-        );
-      }
-      await Future.delayed(
-        Duration.zero,
-        () {
-          return getJsonResponse(context,
-              isfromfile: false, response: response);
-        },
-      );
-    } on SocketException {
-      throw FetchDataException("noInternetErrorMsg".translate(context));
-    } on TimeoutException {
-      throw FetchDataException("nodatafound".translate(context));
-    } on Exception catch (e) {
-      throw Exception(e.toString());
-    }
-  }
-
-  static getJsonResponse(BuildContext context,
-      {bool isfromfile = false,
-      StreamedResponse? streamedResponse,
-      Response? response}) async {
-    int code;
-    if (isfromfile) {
-      code = streamedResponse!.statusCode;
-    } else {
-      code = response!.statusCode;
-    }
-    switch (code) {
-      case 200:
-        if (isfromfile) {
-          var responseData = await streamedResponse!.stream.toBytes();
-          return String.fromCharCodes(responseData);
-        } else {
-          return response!.body;
-        }
-
-      case 400:
-        throw BadRequestException(response!.body.toString());
-      case 401: /* Constant.isUserDeactivated = true;
-        print("isDeactivated ? -- ${Constant.isUserDeactivated}");
-        break; */
-
-        Map getdata = {};
-        if (isfromfile) {
-          var responseData = await streamedResponse!.stream.toBytes();
-          getdata = json.decode(String.fromCharCodes(responseData));
-        } else {
-          getdata = json.decode(response!.body);
-        }
-
-        Future.delayed(
-          Duration.zero,
-          () {
-            showSnackBarMessage(context, getdata[Api.message]);
-          },
-        );
-        throw UnauthorisedException(getdata[Api.message]);
-      case 403:
-        throw UnauthorisedException(response!.body.toString());
-      case 500:
-      default:
-        throw FetchDataException(
-            'Error occurred while Communication with Server with StatusCode: $code');
-    }
-  }
+  // static getJsonResponse(BuildContext context,
+  //     {bool isfromfile = false,
+  //     StreamedResponse? streamedResponse,
+  //     Response? response}) async {
+  //   int code;
+  //   if (isfromfile) {
+  //     code = streamedResponse!.statusCode;
+  //   } else {
+  //     code = response!.statusCode;
+  //   }
+  //   switch (code) {
+  //     case 200:
+  //       if (isfromfile) {
+  //         var responseData = await streamedResponse!.stream.toBytes();
+  //         return String.fromCharCodes(responseData);
+  //       } else {
+  //         return response!.body;
+  //       }
+  //
+  //     case 400:
+  //       throw BadRequestException(response!.body.toString());
+  //     case 401: /* Constant.isUserDeactivated = true;
+  //       print("isDeactivated ? -- ${Constant.isUserDeactivated}");
+  //       break; */
+  //
+  //       Map getdata = {};
+  //       if (isfromfile) {
+  //         var responseData = await streamedResponse!.stream.toBytes();
+  //         getdata = json.decode(String.fromCharCodes(responseData));
+  //       } else {
+  //         getdata = json.decode(response!.body);
+  //       }
+  //
+  //       Future.delayed(
+  //         Duration.zero,
+  //         () {
+  //           showSnackBarMessage(context, getdata[Api.message]);
+  //         },
+  //       );
+  //       throw UnauthorisedException(getdata[Api.message]);
+  //     case 403:
+  //       throw UnauthorisedException(response!.body.toString());
+  //     case 500:
+  //     default:
+  //       throw FetchDataException(
+  //           'Error occurred while Communication with Server with StatusCode: $code');
+  //   }
+  // }
 
   static String getFileSizeString({required int bytes, int decimals = 0}) {
     const suffixes = ["b", "kb", "mb", "gb", "tb"];
@@ -312,18 +314,18 @@ class HelperUtils {
     }
   }
 
-  static Future<File?> compressImageFile(File file) async {
-    try {
-      //final compressedFile = await FlutterNativeImage.compressImage(file.path,quality: Constant.imgQuality,targetWidth: Constant.maxImgWidth,targetHeight: Constant.maxImgHeight);
-      final compressedFile = await FlutterNativeImage.compressImage(
-        file.path,
-        quality: Constant.uploadImageQuality,
-      );
-      return File(compressedFile.path);
-    } catch (e) {
-      return null; //If any error occurs during compression, the process is stopped.
-    }
-  }
+  // static Future<File?> compressImageFile(File file) async {
+  //   try {
+  //     //final compressedFile = await FlutterNativeImage.compressImage(file.path,quality: Constant.imgQuality,targetWidth: Constant.maxImgWidth,targetHeight: Constant.maxImgHeight);
+  //     final compressedFile = await FlutterNativeImage.compressImage(
+  //       file.path,
+  //       quality: Constant.uploadImageQuality,
+  //     );
+  //     return File(compressedFile.path);
+  //   } catch (e) {
+  //     return null; //If any error occurs during compression, the process is stopped.
+  //   }
+  // }
 }
 
 extension StringCasingExtension on String {

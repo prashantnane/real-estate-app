@@ -1,215 +1,229 @@
+// import 'dart:async';
+
 import 'dart:async';
 import 'dart:developer';
-import 'dart:ui';
 
 import 'package:connectivity_plus/connectivity_plus.dart';
-import 'package:firebase_auth/firebase_auth.dart';
-import 'package:flutter/material.dart';
-import 'package:hive/hive.dart';
-import 'package:real_estate_app/extension/sized_box_extensions.dart';
+// import 'package:ebroker/Ui/screens/widgets/Erros/no_internet.dart';
+// import 'package:ebroker/app/routes.dart';
+// import 'package:flutter/services.dart';
+// import 'package:flutter_svg/flutter_svg.dart';
 
-import '../constants/routes.dart';
-import '../utils/themes/app_colors.dart';
-import '../widgets/deviceInfo.dart';
-import '../widgets/widget_function.dart';
+// import '../app/routes.dart';
+// import 'package:ebroker/data/cubits/profile_setting_cubit.dart';
+// import 'package:ebroker/data/cubits/system/fetch_language_cubit.dart';
+// import 'package:ebroker/data/cubits/system/fetch_system_settings_cubit.dart';
+// import 'package:ebroker/data/model/system_settings_model.dart';
+// import 'package:ebroker/utils/AppIcon.dart';
+// import 'package:ebroker/utils/Extensions/extensions.dart';
+// import 'package:ebroker/utils/api.dart';
+// import 'package:ebroker/utils/ui_utils.dart';
+// import 'package:ebroker/main.dart';
+// import 'package:flutter/foundation.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:hive/hive.dart';
+// import 'package:permission_handler/permission_handler.dart';
+import 'package:real_estate_app/Ui/widgets/no_internet.dart';
+import 'package:real_estate_app/utils/Extensions/extensions.dart';
+
+// import '../../app/app.dart';
+import '../../data/cubits/auth/auth_state_cubit.dart';
+// import '../../data/cubits/category/fetch_category_cubit.dart';
+// import '../../data/cubits/outdoorfacility/fetch_outdoor_facility_list.dart';
+// import '../../data/cubits/subscription/get_subsctiption_package_limits_cubit.dart';
+import '../../utils/constant.dart';
+import '../../utils/hive_keys.dart';
+import '../../utils/hive_utils.dart';
+import '../app/routes.dart';
+import '../utils/AppIcon.dart';
+import '../utils/ui_utils.dart';
 
 class SplashScreen extends StatefulWidget {
-  const SplashScreen({super.key});
+  const SplashScreen({Key? key}) : super(key: key);
 
   @override
-  State<SplashScreen> createState() => _SplashScreenState();
+  SplashScreenState createState() => SplashScreenState();
 }
 
-class _SplashScreenState extends State<SplashScreen> {
-  List<String> loadingMessages = [
-    "Hang tight! We're migrating data securely.",
-    "Almost there! Your data is being processed.",
-    "Just a moment! We're setting things up for you.",
-    "Thanks for your patience!",
-    "We'll be done shortly."
-  ];
-  int currentMessageIndex = 0;
-  Timer? timer;
-  double progress = 0.0;
-  bool dataMigrated = true;
+class SplashScreenState extends State<SplashScreen>
+    with TickerProviderStateMixin {
+  late AuthenticationState authenticationState;
+
+  bool isTimerCompleted = false;
+  bool isSettingsLoaded = false;
+  bool isLanguageLoaded = false;
 
   @override
   void initState() {
+    // context.read<FetchCategoryCubit>().fetchCategories();
+    // context.read<FetchOutdoorFacilityListCubit>().fetch();
+    // locationPermission();
     super.initState();
-    startTimerForSplash();
-    timer = Timer.periodic(Duration(seconds: 5), (Timer t) {
-      setState(() {
-        currentMessageIndex =
-            (currentMessageIndex + 1) % loadingMessages.length;
-      });
+
+    // getDefaultLanguage(
+    //       () {
+    //     isLanguageLoaded = true;
+    //     setState(
+    //           () {},
+    //     );
+    //   },
+    // );
+
+    checkIsUserAuthenticated();
+    // bool isDataAvailable = checkPersistedDataAvailibility();
+    Connectivity().checkConnectivity().then((value) {
+      if (value == ConnectivityResult.none ) {
+        Navigator.pushReplacement(context, MaterialPageRoute(
+          builder: (context) {
+            return NoInternet(
+              onRetry: () {
+                Navigator.pushReplacementNamed(
+                  context,
+                  Routes.splash,
+                );
+              },
+            );
+          },
+        ));
+      }
     });
+    startTimer();
+    //get Currency Symbol from Admin Panel
+    // Future.delayed(Duration.zero, () {
+    //   context.read<ProfileSettingCubit>().fetchProfileSetting(
+    //     context,
+    //     "currency_symbol",
+    //   );
+    // });
   }
+
+  // Future<void> locationPermission() async {
+  //   if ((await Permission.location.status) == PermissionStatus.denied) {
+  //     await Permission.location.request();
+  //   }
+  // }
 
   @override
   void dispose() {
-    timer?.cancel();
+    SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle.dark);
     super.dispose();
   }
 
-  void startTimerForSplash() async {
-    final FirebaseAuth auth = FirebaseAuth.instance;
-
-    // Check internet connectivity
-    var connectivityResult = await Connectivity().checkConnectivity();
-    if (connectivityResult.contains(ConnectivityResult.none)) {
-      _showNoInternetDialog();
-      return;
+  void checkIsUserAuthenticated() async {
+    authenticationState = context.read<AuthenticationCubit>().state;
+    if (authenticationState == AuthenticationState.authenticated) {
+      ///Only load sensitive details if user is authenticated
+      ///This call will load sensitive details with settings
+      // context.read<FetchSystemSettingsCubit>().fetchSettings(
+      //   isAnonymouse: false,
+      //   forceRefresh: true,
+      // );
+      completeProfileCheck();
     }
+  }
 
-    // Perform data migration
-    setState(() {
-      progress = 0.0;
+  Future<void> startTimer() async {
+    Timer(const Duration(seconds: 3), () {
+      isTimerCompleted = true;
+      if (mounted) setState(() {});
     });
-    // await _migrateData();
+  }
 
-    // Navigate based on user authentication and validity
-    if (auth.currentUser == null) {
-      Navigator.of(context).pushNamed(AppRoutes.SIGNIN);
-    } else {
-      // Box metadataBox = await Hive.openBox(HiveBoxes.metaData);
-      // String? username = auth.currentUser!.email;
-      // DateTime? userValidity = metadataBox.get(HiveAttributes.validityLocal);
-      // DateTime datetime = DateTime.parse(userValidity.toString());
-      // String formattedDate =
-      //     "${_twoDigits(datetime.day)}/${_twoDigits(datetime.month)}/${datetime.year}";
-
-      // if (auth.currentUser!.isAnonymous ||
-      //     (userValidity ?? DateTime.now()).isBefore(DateTime.now())) {
-      //   ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-      //     backgroundColor: AppColors.yellowColor,
-      //     content: const Text(
-      //         style: TextStyle(color: black),
-      //         'User validity expired. Contact Admin!'),
-      //   ));
-      //   Navigator.of(context).pushNamed(AppRoutes.SIGNIN);
-      // } else {
-      //   Navigator.of(context).pushNamed(
-      //     AppRoutes.HOME,
-      //     arguments: {"name": username ?? "", "validity": formattedDate ?? ""},
-      //   );
-      // }
+  void navigateCheck() {
+    log(
+      {
+        "timer": isTimerCompleted,
+        "setting": isSettingsLoaded,
+        "language": isLanguageLoaded
+      }.toString(),
+      name: "StatusNavigation",
+    );
+    if (isTimerCompleted && isSettingsLoaded && isLanguageLoaded) {
+      navigateToScreen();
     }
   }
 
-  String _twoDigits(int n) {
-    return n >= 10 ? "$n" : "0$n";
+  void completeProfileCheck() {
+    if (HiveUtils.getUserDetails().name == "" ||
+        HiveUtils.getUserDetails().email == "") {
+      Future.delayed(
+        const Duration(milliseconds: 100),
+            () {
+          Navigator.pushReplacementNamed(
+            context,
+            Routes.completeProfile,
+            arguments: {
+              "from": "login",
+            },
+          );
+        },
+      );
+    }
   }
 
-  // Future<void> _migrateData() async {
-  //   await DataMigration().migrateData(
-  //     onProgress: (step, totalSteps) {
-  //       setState(() {
-  //         progress = step / totalSteps;
-  //         log('progress done: $progress');
-  //       });
-  //     },
-  //   );
-  // }
-
-  void _showNoInternetDialog() {
-    showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: Text('No Internet'),
-        content: Text('Please check your internet connection and try again.'),
-        actions: [
-          TextButton(
-            onPressed: () {
-              Navigator.of(context).pop();
-              startTimerForSplash(); // Retry connection and migration
-            },
-            child: Text('Retry'),
-          ),
-        ],
-      ),
-    );
+  void navigateToScreen() {
+    if (authenticationState == AuthenticationState.authenticated) {
+      Future.delayed(Duration.zero, () {
+        Navigator.of(context)
+            .pushReplacementNamed(Routes.main, arguments: {'from': "main"});
+      });
+    } else if (authenticationState == AuthenticationState.unAuthenticated) {
+      if (Hive.box(HiveKeys.userDetailsBox).get("isGuest") == true) {
+        Future.delayed(Duration.zero, () {
+          Navigator.of(context)
+              .pushReplacementNamed(Routes.main, arguments: {"from": "splash"});
+        });
+      } else {
+        Future.delayed(Duration.zero, () {
+          Navigator.of(context).pushReplacementNamed(Routes.login);
+        });
+      }
+    } else if (authenticationState == AuthenticationState.firstTime) {
+      Future.delayed(Duration.zero, () {
+        Navigator.of(context).pushReplacementNamed(Routes.onboarding);
+      });
+    }
   }
 
   @override
   Widget build(BuildContext context) {
-    final screenWidth = MediaQuery.sizeOf(context).width;
-    return Scaffold(
-      body: Stack(
-        children: [
-          Container(
-            width: DeviceInfo.deviceWidth(),
-            height: DeviceInfo.deviceHeight(),
-            color: Colors.white,
+    SystemChrome.setEnabledSystemUIMode(
+      SystemUiMode.manual,
+      overlays: SystemUiOverlay.values,
+    );
+
+    navigateCheck();
+
+    return AnnotatedRegion(
+          value: SystemUiOverlayStyle(
+            statusBarColor: context.color.teritoryColor,
           ),
-          Align(
-            alignment: Alignment.topCenter,
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              mainAxisAlignment: MainAxisAlignment.center,
-              crossAxisAlignment: CrossAxisAlignment.center,
+          child: Scaffold(
+            backgroundColor: context.color.teritoryColor,
+            body: Stack(
               children: [
-                addVerticalSpace(DeviceInfo.deviceHeight() * 0.35),
-                SizedBox(
-                  width: 200,
-                  height: 200,
-                  child: Image.asset(
-                    "assets/image/png/rev_logo_final.png",
-                  ),
+                Align(
+                  alignment: Alignment.center,
+                  child: SizedBox(
+                      width: 150,
+                      height: 150,
+                      child: UiUtils.getSvg(
+                        AppIcons.splashLogo,
+                      )),
                 ),
-                10.kH,
-                Text(
-                  'Welcome To RevAugment',
-                  style: TextStyle(
-                      fontSize: 24, color: dark, fontWeight: FontWeight.bold),
-                ),
-                10.kH,
-                dataMigrated
-                    ? AnimatedSwitcher(
-                        duration: Duration(seconds: 1),
-                        transitionBuilder:
-                            (Widget child, Animation<double> animation) {
-                          return ScaleTransition(scale: animation, child: child);
-                        },
-                        child: Text(
-                          loadingMessages[currentMessageIndex],
-                          key: ValueKey<int>(currentMessageIndex),
-                          textAlign: TextAlign.center,
-                          style: const TextStyle(
-                              fontSize: 16,
-                              color: darkGrey,
-                              fontWeight: FontWeight.w500),
-                        ),
-                      )
-                    : const SizedBox(),
-                5.kH,
-                dataMigrated
-                    ? SizedBox(
-                        width: screenWidth <= 600 ? 250 : 300,
-                        height: 10,
-                        child: ClipRRect(
-                          borderRadius: BorderRadius.all(Radius.circular(50)),
-                          child: LinearProgressIndicator(
-                            backgroundColor: lightGrey,
-                            valueColor: AlwaysStoppedAnimation<Color>(
-                                AppColors.blueColor),
-                            value: progress,
-                          ),
-                        ),
-                      )
-                    : const SizedBox(),
-                30.kH,
-                dataMigrated
-                    ? Text(
-                        'Please do not turn off the Internet',
-                        style: TextStyle(fontSize: 12),
-                      )
-                    : SizedBox(),
-                addVerticalSpace(50),
+                Padding(
+                  padding: const EdgeInsets.symmetric(vertical: 16.0),
+                  child: Align(
+                      alignment: Alignment.bottomCenter,
+                      key: const ValueKey("companylogo"),
+                      child: UiUtils.getSvg(AppIcons.companyLogo)),
+                )
               ],
             ),
           ),
-        ],
-      ),
-    );
+        );
+
   }
 }
