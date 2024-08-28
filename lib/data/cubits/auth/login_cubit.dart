@@ -44,7 +44,8 @@ class LoginCubit extends Cubit<LoginState> {
         email: email,
         password: password,
       );
-
+      HiveUtils.setUserIsAuthenticated();
+      HiveUtils.setUserIsNotNew();
       ///Storing data to local database {HIVE}
       // HiveUtils.setJWT(result['token']);
       //

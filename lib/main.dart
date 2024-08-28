@@ -5,7 +5,9 @@ import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:hive/hive.dart';
-// import 'package:path_provider/path_provider.dart';
+import 'package:real_estate_app/utils/hive_keys.dart';
+import 'package:real_estate_app/utils/hive_utils.dart';
+import 'package:path_provider/path_provider.dart';
 
 
 // import 'data/migration/fireabseToHive.dart';
@@ -39,8 +41,8 @@ Future<void> main() async {
     options: DefaultFirebaseOptions.currentPlatform,
   );
   if (!kIsWeb) {
-    // final documentsDirectory = await getApplicationDocumentsDirectory();
-    // Hive.init(documentsDirectory.path);
+    final documentsDirectory = await getApplicationDocumentsDirectory();
+    Hive.init(documentsDirectory.path);
   }
   // Hive.registerAdapter(ChairHiveAdapter());
   // Hive.registerAdapter(ImagePreviewHiveAdapter());
@@ -52,6 +54,12 @@ Future<void> main() async {
   // await Hive.openBox<ProductHive>(HiveBoxes.productBox);
   // await Hive.openBox<ImagePreviewHive>(HiveBoxes.imagePreviewBox);
   // await DataMigration().migrateData();
+  // await Hive.initFlutter();
+  await Hive.openBox(HiveKeys.userDetailsBox);
+  await Hive.openBox(HiveKeys.authBox);
+  // await Hive.openBox(HiveKeys.languageBox);
+  // await Hive.openBox(HiveKeys.themeBox);
+  // await Hive.openBox(HiveKeys.svgBox);
   runApp(
       MyApp()
   );
@@ -77,6 +85,11 @@ class MyApp extends StatelessWidget {
 }
 
 class HomeScreen extends StatelessWidget {
+  // String name = (HiveUtils.getUserDetails().name) ?? "";
+  // String email = HiveUtils.getUserDetails().email ?? "";
+  // String phone = HiveUtils.getUserDetails().mobile ?? "";
+  // String address = HiveUtils.getUserDetails().address ?? "";
+
   @override
   Widget build(BuildContext context) {
     return BlocListener<LoginCubit, LoginState>(
@@ -98,7 +111,12 @@ class HomeScreen extends StatelessWidget {
             ),
           ],
         ),
-        body: Center(child: Text('Welcome!')),
+        body: Column(
+          children: [
+            // Text(name),
+            Center(child: Text('Welcome!')),
+          ],
+        ),
       ),
     );
   }
