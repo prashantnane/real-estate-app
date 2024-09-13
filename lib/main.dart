@@ -5,6 +5,7 @@ import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:hive/hive.dart';
+import 'package:real_estate_app/Ui/splash_screen.dart';
 import 'package:real_estate_app/utils/hive_keys.dart';
 import 'package:real_estate_app/utils/hive_utils.dart';
 import 'package:path_provider/path_provider.dart';
@@ -17,7 +18,9 @@ import 'package:path_provider/path_provider.dart';
 // import 'data/models/hive/product.dart';
 // import 'data/models/hive/product3DAssetHive.dart';
 import 'Ui/login_screen.dart';
+import 'app/routes.dart';
 import 'data/cubits/auth/auth_cubit.dart';
+import 'data/cubits/auth/auth_state_cubit.dart';
 import 'data/cubits/auth/login_cubit.dart';
 import 'firebase_options.dart';
 
@@ -71,14 +74,23 @@ class MyApp extends StatelessWidget {
     return MultiBlocProvider(
       providers: [
         BlocProvider(create: (context) => AuthCubit()),
+        BlocProvider(create: (context) => AuthenticationCubit()),
         BlocProvider(create: (context) => LoginCubit()),
       ],
       child: MaterialApp(
-        home: LoginScreen(),
-        routes: {
-          '/home': (context) => HomeScreen(),
-        },
-      ),
+        scrollBehavior: const MaterialScrollBehavior().copyWith(
+          dragDevices: {
+            PointerDeviceKind.mouse,
+            PointerDeviceKind.touch,
+            PointerDeviceKind.stylus,
+            PointerDeviceKind.unknown
+          },
+        ),
+        debugShowCheckedModeBanner: false,
+        initialRoute: AppRoutes.SPLASH,
+        onGenerateRoute: (settings) => generateRoute(settings),
+        // routes: getApplicationRoutes(),
+      )
     );
   }
 
@@ -95,7 +107,7 @@ class HomeScreen extends StatelessWidget {
     return BlocListener<LoginCubit, LoginState>(
       listener: (context, state) {
         if (state is LoginInitial) {
-          Navigator.of(context).pushReplacementNamed('/');
+          Navigator.of(context).pushReplacementNamed(AppRoutes.LOGIN);
         }
       },
       child: Scaffold(
@@ -107,6 +119,7 @@ class HomeScreen extends StatelessWidget {
               onPressed: () {
                 context.read<LoginCubit>().logout(
                 );
+                HiveUtils.setUserIsNotAuthenticated();
               },
             ),
           ],

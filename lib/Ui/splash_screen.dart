@@ -79,9 +79,8 @@ class SplashScreenState extends State<SplashScreen>
           builder: (context) {
             return NoInternet(
               onRetry: () {
-                Navigator.pushReplacementNamed(
-                  context,
-                  Routes.splash,
+                Navigator.of(context).pushReplacementNamed(
+                  '/splash',
                 );
               },
             );
@@ -140,9 +139,8 @@ class SplashScreenState extends State<SplashScreen>
       }.toString(),
       name: "StatusNavigation",
     );
-    if (isTimerCompleted && isSettingsLoaded && isLanguageLoaded) {
-      navigateToScreen();
-    }
+    navigateToScreen();
+
   }
 
   void completeProfileCheck() {
@@ -151,13 +149,13 @@ class SplashScreenState extends State<SplashScreen>
       Future.delayed(
         const Duration(milliseconds: 100),
             () {
-          Navigator.pushReplacementNamed(
-            context,
-            Routes.completeProfile,
-            arguments: {
-              "from": "login",
-            },
-          );
+          // Navigator.pushReplacementNamed(
+          //   context,
+          //   Routes.completeProfile,
+          //   arguments: {
+          //     "from": "login",
+          //   },
+          // );
         },
       );
     }
@@ -167,22 +165,22 @@ class SplashScreenState extends State<SplashScreen>
     if (authenticationState == AuthenticationState.authenticated) {
       Future.delayed(Duration.zero, () {
         Navigator.of(context)
-            .pushReplacementNamed(Routes.main, arguments: {'from': "main"});
+            .pushReplacementNamed(AppRoutes.HOME);
       });
     } else if (authenticationState == AuthenticationState.unAuthenticated) {
       if (Hive.box(HiveKeys.userDetailsBox).get("isGuest") == true) {
         Future.delayed(Duration.zero, () {
           Navigator.of(context)
-              .pushReplacementNamed(Routes.main, arguments: {"from": "splash"});
+              .pushReplacementNamed(AppRoutes.HOME);
         });
       } else {
         Future.delayed(Duration.zero, () {
-          Navigator.of(context).pushReplacementNamed(Routes.login);
+          Navigator.of(context).pushReplacementNamed(AppRoutes.LOGIN);
         });
       }
     } else if (authenticationState == AuthenticationState.firstTime) {
       Future.delayed(Duration.zero, () {
-        Navigator.of(context).pushReplacementNamed(Routes.onboarding);
+        // Navigator.of(context).pushReplacementNamed(Routes.onboarding);
       });
     }
   }

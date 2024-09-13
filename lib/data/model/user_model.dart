@@ -1,86 +1,92 @@
 // ignore_for_file: public_member_api_docs, sort_constructors_first
+import 'dart:developer';
+
+import 'package:cloud_firestore/cloud_firestore.dart';
+
 import '../../utils/Extensions/lib/adaptive_type.dart';
 
 class UserModel {
-  String? address;
-  String? createdAt;
-  int? customertotalpost;
+  String? id;
+  String? name;
   String? email;
-  String? fcmId;
-  String? firebaseId;
-  int? id;
+  String? mobile;
+  String? address;
   int? isActive;
   bool? isProfileCompleted;
-  String? logintype;
-  String? mobile;
-  String? name;
   int? notification;
   String? profile;
-  String? token;
+  String? rera;
+  String? createdAt;
   String? updatedAt;
 
   UserModel(
-      {this.address,
-      this.createdAt,
-      this.customertotalpost,
-      this.email,
-      this.fcmId,
-      this.firebaseId,
+      {
       this.id,
+      this.name,
+      this.mobile,
+      this.email,
+      this.address,
       this.isActive,
       this.isProfileCompleted,
-      this.logintype,
-      this.mobile,
-      this.name,
       this.notification,
       this.profile,
-      this.token,
-      this.updatedAt});
+      this.rera,
+      this.createdAt,
+      this.updatedAt
+      });
 
   UserModel.fromJson(Map<String, dynamic> json) {
-    address = json['address'];
-    createdAt = json['created_at'];
-    customertotalpost = Adapter.forceInt(json['customertotalpost']);
-    email = json['email'];
-    fcmId = json['fcm_id'];
-    firebaseId = json['firebase_id'];
     id = json['id'];
+    name = json['name'];
+    mobile = json['mobile'];
+    email = json['email'];
+    address = json['address'];
     isActive = Adapter.forceInt(json['isActive']);
     isProfileCompleted = json['isProfileCompleted'];
-    logintype = json['logintype'];
-    mobile = json['mobile'];
-    name = json['name'];
     notification = (json['notification'] is int)
         ? json['notification']
         : int.parse((json['notification']));
     profile = json['profile'];
-    token = json['token'];
+    rera = json['rera'];
+    createdAt = json['created_at'];
     updatedAt = json['updated_at'];
   }
 
   Map<String, dynamic> toJson() {
     final Map<String, dynamic> data = <String, dynamic>{};
-    data['address'] = address;
-    data['created_at'] = createdAt;
-    data['customertotalpost'] = customertotalpost;
-    data['email'] = email;
-    data['fcm_id'] = fcmId;
-    data['firebase_id'] = firebaseId;
     data['id'] = id;
+    data['name'] = name;
+    data['mobile'] = mobile;
+    data['email'] = email;
+    data['address'] = address;
     data['isActive'] = isActive;
     data['isProfileCompleted'] = isProfileCompleted;
-    data['logintype'] = logintype;
-    data['mobile'] = mobile;
-    data['name'] = name;
     data['notification'] = notification;
     data['profile'] = profile;
-    data['token'] = token;
+    data['created_at'] = createdAt;
     data['updated_at'] = updatedAt;
     return data;
   }
 
+  factory UserModel.fromSnapshot(DocumentSnapshot<Map<String, dynamic>> snapshot) {
+    Map<String, dynamic>? data = snapshot.data();
+    log("Data at snapshot.id is : ${snapshot.id}");
+    return UserModel(
+      id: snapshot.id,
+      name: data?['name'] ?? '',
+      mobile: data?['mobile'] ?? '',
+      email: data?['email'] ?? '',
+      address: data?['address'] ?? '',
+      isActive: data?['isActive'] ?? '',
+      isProfileCompleted: data?['isProfileCompleted'] ?? '',
+      notification: data?['notification'] ?? '',
+      profile: data?['profile'] ?? '',
+      rera: data?['rera'] ?? '',
+    );
+  }
+
   @override
   String toString() {
-    return 'UserModel(address: $address, createdAt: $createdAt, customertotalpost: $customertotalpost, email: $email, fcmId: $fcmId, firebaseId: $firebaseId, id: $id, isActive: $isActive, isProfileCompleted: $isProfileCompleted, logintype: $logintype, mobile: $mobile, name: $name, notification: $notification, profile: $profile, token: $token, updatedAt: $updatedAt)';
+    return 'UserModel(address: $address, createdAt: $createdAt, email: $email, isActive: $isActive, isProfileCompleted: $isProfileCompleted, mobile: $mobile, name: $name, notification: $notification, profile: $profile, updatedAt: $updatedAt)';
   }
 }

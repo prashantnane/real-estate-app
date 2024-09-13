@@ -4,11 +4,18 @@
 // import 'package:ebroker/utils/hive_utils.dart';
 import 'dart:developer';
 
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
+import '../../../utils/app_constant.dart';
+import '../../../utils/auditFields.dart';
 import '../../../utils/hive_utils.dart';
 import '../../Repositories/auth_repository.dart';
+import '../../dataservices/firebase/createNewEntity.dart';
+import '../../model/generic/api_response.dart';
+import '../../model/user_model.dart';
 
 abstract class LoginState {}
 
@@ -17,11 +24,12 @@ class LoginInitial extends LoginState {}
 class LoginInProgress extends LoginState {}
 
 class LoginSuccess extends LoginState {
-  final bool isProfileCompleted;
+  // final bool isProfileCompleted;
 
-  LoginSuccess({
-    required this.isProfileCompleted,
-  });
+  LoginSuccess(// {
+      // required this.isProfileCompleted,
+      // }
+      );
 }
 
 class LoginFailure extends LoginState {
@@ -46,6 +54,7 @@ class LoginCubit extends Cubit<LoginState> {
       );
       HiveUtils.setUserIsAuthenticated();
       HiveUtils.setUserIsNotNew();
+
       ///Storing data to local database {HIVE}
       // HiveUtils.setJWT(result['token']);
       //
@@ -62,26 +71,108 @@ class LoginCubit extends Cubit<LoginState> {
       //   HiveUtils.setUserData(data);
       // }
 
-      emit(LoginSuccess(isProfileCompleted: isProfileIsCompleted));
+      emit(LoginSuccess());
       log('Login successful');
     } on FirebaseAuthException catch (e) {
       String errorMsg = '';
 
       if (e.code == 'user-not-found') {
         errorMsg = 'No user found for that email.';
-        print("Error Msg while authentication: $errorMsg");
-      } else if (e.code == 'wrong-password') {
-        errorMsg = 'Wrong password provided for that user.';
-        print("Error Msg while authentication: $errorMsg");
+      } else if (e.code == 'invalid-credential') {
+        errorMsg = 'Invalid Email ID or Password.';
       } else if (e.code == 'invalid-email') {
         errorMsg = 'Email ID not found.';
-        print("Error Msg while authentication: $errorMsg");
-      } else if (e.code == 'channel-error') {
-        errorMsg = 'Invalid Email ID or Password';
-        print("Error Msg while authentication: $errorMsg");
+      } else {
+        errorMsg = 'Please check Email ID or password once.';
       }
-      log('Login failed: $e');
-      emit(LoginFailure(e.toString()));
+      log('Login failed: ${e.code}');
+      emit(LoginFailure(errorMsg));
+    }
+  }
+
+  void signUp(
+      {required String email, required String password, required String phone, required String name, required String rera, required String address}) async {
+    try {
+      emit(LoginInProgress());
+
+      UserCredential userCredential =
+      await _auth.createUserWithEmailAndPassword(
+          email: email, password: password);
+
+      // User? user = userCredential.user;
+      // if (user != null && !user.emailVerified) {
+      //   await user.sendEmailVerification();
+      //   print('Verification email sent to ${user.email}');
+      // }
+
+      UserModel? signupUser =
+      UserModel(
+        id: userCredential.user?.uid,
+        name: name,
+        email: email,
+        mobile: phone,
+        address: address,
+        rera: rera,
+        isActive: 1,
+      );
+
+      ApiResponse<UserModel> response = await createNewUser(signupUser);
+      (response.status == "success") ? {
+        // Navigator.pop(context)
+      log("Tis is create user response from success: ${response.status}")
+      } : {
+      };
+      log("THis is create user response : ${response.status}");
+
+      // if (user != null) {
+      //   await _firebaseFirestore.collection('usersAdmin').doc(user.uid).set({
+      //     'uid': user.uid,
+      //     'email': user.email,
+      //     'role': _selectedRole,
+      //     'isLoggedIn': false,
+      //     'timestamp': FieldValue.serverTimestamp()
+      //   });
+      // }
+
+      print('User created successfully');
+
+      HiveUtils.setUserIsAuthenticated();
+      HiveUtils.setUserIsNotNew();
+
+      emit(LoginSuccess());
+      log('Login successful');
+    } on FirebaseAuthException catch (e) {
+      String errorMsg = '';
+
+      if (e.code == 'weak-password') {
+        errorMsg = 'The password provided is too weak.';
+      } else if (e.code == 'email-already-in-use') {
+        errorMsg = 'The email address is already in use.';
+      } else if (e.code == 'invalid-email') {
+        errorMsg = 'Invalid email address.';
+      }
+      log('Login failed: $errorMsg');
+      emit(LoginFailure(errorMsg));
+
+    }
+  }
+
+  Future<ApiResponse<UserModel>> createNewUser(UserModel inputLoginUser) async {
+    try {
+      if(inputLoginUser.id !='' || inputLoginUser.id !=null || inputLoginUser.id!.isNotEmpty ){
+        ApiResponse<DocumentSnapshot<Map<String, dynamic>>> response  = await createEntityRecordWithID(FirebaseCollection.users,inputLoginUser.id??"",inputLoginUser.toJson() ) ;
+        if(response.status=="success"){
+          addAuditFields(FirebaseCollection.users, response.data!.id);
+          UserModel returnedLoginUser = UserModel.fromSnapshot(response.data!);
+          return ApiResponse(status: "success", message: "success",data:returnedLoginUser );
+        }
+        else{
+          return ApiResponse(status: "unSuccessful", message: "LoginUser Creation Error",data:null );
+        }
+      }
+      return ApiResponse(status: "unSuccessful", message: "LoginUser Creation Error",data:null );
+    }catch (e) {
+      return ApiResponse(status: "error", message: "Failed with error" ,data: null);
     }
   }
 
