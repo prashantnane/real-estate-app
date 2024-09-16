@@ -44,7 +44,7 @@ class _LoginScreenState extends State<LoginScreen> {
                 type: MessageType.error);
           }
           if (state is LoginSuccess) {
-            Navigator.of(context).pushReplacementNamed(AppRoutes.HOME);
+            Navigator.of(context).pushReplacementNamed(AppRoutes.MAIN);
           }
         },
         child: SingleChildScrollView(

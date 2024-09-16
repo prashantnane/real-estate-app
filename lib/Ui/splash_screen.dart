@@ -80,7 +80,7 @@ class SplashScreenState extends State<SplashScreen>
             return NoInternet(
               onRetry: () {
                 Navigator.of(context).pushReplacementNamed(
-                  '/splash',
+                  AppRoutes.SPLASH,
                 );
               },
             );
@@ -119,7 +119,7 @@ class SplashScreenState extends State<SplashScreen>
       //   isAnonymouse: false,
       //   forceRefresh: true,
       // );
-      completeProfileCheck();
+      // completeProfileCheck();
     }
   }
 
@@ -144,6 +144,7 @@ class SplashScreenState extends State<SplashScreen>
   }
 
   void completeProfileCheck() {
+    log('this is user Details: ${HiveUtils.getUserDetails().name}');
     if (HiveUtils.getUserDetails().name == "" ||
         HiveUtils.getUserDetails().email == "") {
       Future.delayed(
@@ -165,13 +166,13 @@ class SplashScreenState extends State<SplashScreen>
     if (authenticationState == AuthenticationState.authenticated) {
       Future.delayed(Duration.zero, () {
         Navigator.of(context)
-            .pushReplacementNamed(AppRoutes.HOME);
+            .pushReplacementNamed(AppRoutes.MAIN);
       });
     } else if (authenticationState == AuthenticationState.unAuthenticated) {
       if (Hive.box(HiveKeys.userDetailsBox).get("isGuest") == true) {
         Future.delayed(Duration.zero, () {
           Navigator.of(context)
-              .pushReplacementNamed(AppRoutes.HOME);
+              .pushReplacementNamed(AppRoutes.MAIN);
         });
       } else {
         Future.delayed(Duration.zero, () {

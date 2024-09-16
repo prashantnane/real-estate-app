@@ -1,7 +1,9 @@
 // ignore_for_file: constant_identifier_names
 
 import 'package:flutter/material.dart';
+import 'package:real_estate_app/Ui/main_activity.dart';
 
+import '../Ui/home_screen.dart';
 import '../Ui/login_screen.dart';
 import '../Ui/splash_screen.dart';
 import '../main.dart';
@@ -15,6 +17,7 @@ class AppRoutes {
   static const String FILTER = '/filter';
   static const String SIGNUP = '/signup';
   static const String LOGIN = '/signin';
+  static const String MAIN = '/main_activity';
 }
 
 Route<dynamic> generateRoute(RouteSettings routeSettings) {
@@ -33,6 +36,11 @@ Route<dynamic> generateRoute(RouteSettings routeSettings) {
       return MaterialPageRoute(
         settings: routeSettings,
         builder: (_) => LoginScreen(),
+      );
+      case AppRoutes.MAIN:
+      return MaterialPageRoute(
+        settings: routeSettings,
+        builder: (_) => MainActivity(),
       );
     default:
       return MaterialPageRoute(

@@ -44,7 +44,7 @@ class UiUtils {
   }
 
   static String getTranslatedLabel(BuildContext context, String labelKey) {
-    return (AppLocalization.of(context)!.getTranslatedValues(labelKey) ??
+    return (AppLocalization.of(context)?.getTranslatedValues(labelKey) ??
             labelKey)
         .trim();
   }
